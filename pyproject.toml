@@ -1,0 +1,26 @@
+[project]
+name = "photovault"
+version = "0.1.0"
+description = "Self-hosted photo archive manager"
+requires-python = ">=3.13"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlalchemy",
+    "pydantic",
+    "pillow",
+    "exifread",
+    "python-multipart",
+    "loguru",
+    "watchdog",
+    "opencv-python",
+    "imagehash",
+    "ffmpeg-python",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
