@@ -1,6 +1,7 @@
+
 [project]
 name = "photovault"
-version = "0.1.0"
+version = "0.2.0"
 description = "Self-hosted photo archive manager"
 requires-python = ">=3.13"
 dependencies = [
@@ -14,6 +15,7 @@ dependencies = [
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
+pythonpath = ["backend"]
 
 [tool.ruff]
 line-length = 100

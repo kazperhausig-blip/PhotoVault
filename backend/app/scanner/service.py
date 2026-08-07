@@ -1,0 +1,90 @@
+
+from datetime import datetime
+from pathlib import Path
+from typing import Iterator
+import os
+from loguru import logger
+from sqlalchemy import select
+from app.config import settings
+from app.database import SessionLocal
+from app.models.photo import Photo
+from app.models.scan_job import ScanJob
+from app.scanner.extensions import SUPPORTED_EXTENSIONS, media_type_for_extension
+from app.scanner.hashing import sha256_file
+from app.scanner import state
+
+def _is_within(path: Path, parent: Path) -> bool:
+    try:
+        path.resolve().relative_to(parent.resolve())
+        return True
+    except ValueError:
+        return False
+
+def validate_scan_root(requested: Path | None) -> Path:
+    root = (requested or settings.scan_root).resolve()
+    storage = settings.storage_path.resolve()
+    if not root.exists(): raise ValueError(f"Scan path does not exist: {root}")
+    if not root.is_dir(): raise ValueError(f"Scan path is not a directory: {root}")
+    if not _is_within(root, storage): raise ValueError("Scan path must be inside the configured storage tree")
+    return root
+
+def _is_excluded(path: Path) -> bool:
+    resolved = path.resolve()
+    return any(_is_within(resolved, excluded) for excluded in settings.excluded_paths)
+
+def discover_media(root: Path) -> Iterator[Path]:
+    for current_root, dirnames, filenames in os.walk(root):
+        current = Path(current_root)
+        dirnames[:] = [name for name in dirnames if not _is_excluded(current / name) and not name.startswith(".") and name not in {"@eaDir", "#recycle", ".Trash", ".Trashes"}]
+        for filename in filenames:
+            if filename.startswith("."): continue
+            path = current / filename
+            if path.suffix.lower() in SUPPORTED_EXTENSIONS:
+                yield path
+
+def create_scan_job(root: Path) -> int:
+    with SessionLocal() as session:
+        job = ScanJob(status="queued", root_path=str(root), started_at=datetime.utcnow())
+        session.add(job); session.commit(); session.refresh(job); return job.id
+
+def run_scan(job_id: int, root: Path) -> None:
+    if not state.begin(job_id=job_id, root_path=str(root)):
+        logger.warning("A scan is already running"); return
+    logger.info("Starting media scan: {}", root)
+    with SessionLocal() as session:
+        job = session.get(ScanJob, job_id)
+        if job is None: state.finish(); return
+        job.status = "running"; session.commit()
+        try:
+            for path in discover_media(root):
+                state.increment("discovered"); state.update(current_file=str(path))
+                job.discovered = state.snapshot()["discovered"]
+                try:
+                    stat = path.stat(); modified_at = datetime.fromtimestamp(stat.st_mtime); now = datetime.utcnow()
+                    existing = session.scalar(select(Photo).where(Photo.path == str(path)))
+                    if existing is not None and existing.size_bytes == stat.st_size and existing.modified_at == modified_at and existing.checksum_sha256:
+                        existing.last_seen_at = now
+                        state.increment("skipped_unchanged"); job.skipped_unchanged = state.snapshot()["skipped_unchanged"]
+                        session.commit(); continue
+                    checksum = sha256_file(path)
+                    if existing is None:
+                        existing = Photo(path=str(path), filename=path.name, extension=path.suffix.lower(), size_bytes=stat.st_size, checksum_sha256=checksum, modified_at=modified_at, media_type=media_type_for_extension(path.suffix), last_seen_at=now)
+                        session.add(existing)
+                    else:
+                        existing.filename = path.name; existing.extension = path.suffix.lower(); existing.size_bytes = stat.st_size
+                        existing.checksum_sha256 = checksum; existing.modified_at = modified_at; existing.media_type = media_type_for_extension(path.suffix); existing.last_seen_at = now
+                    session.commit(); state.increment("indexed"); job.indexed = state.snapshot()["indexed"]
+                except Exception as exc:
+                    session.rollback(); state.increment("errors"); job.errors = state.snapshot()["errors"]
+                    logger.warning("Could not index {}: {}", path, exc)
+                if state.snapshot()["discovered"] % 25 == 0: session.commit()
+            snap = state.snapshot(); job.status = "completed"; job.finished_at = datetime.utcnow()
+            job.discovered = snap["discovered"]; job.indexed = snap["indexed"]; job.skipped_unchanged = snap["skipped_unchanged"]; job.errors = snap["errors"]
+            session.commit(); logger.info("Scan complete. discovered={} indexed={} unchanged={} errors={}", job.discovered, job.indexed, job.skipped_unchanged, job.errors)
+        except Exception as exc:
+            session.rollback(); job = session.get(ScanJob, job_id)
+            if job is not None:
+                job.status = "failed"; job.finished_at = datetime.utcnow(); job.error_message = str(exc); job.errors = state.snapshot()["errors"] + 1; session.commit()
+            logger.exception("Scan failed: {}", exc)
+        finally:
+            state.finish()

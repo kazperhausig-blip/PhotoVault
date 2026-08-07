@@ -1,60 +1,36 @@
-# PhotoVault
 
-PhotoVault is a self-hosted photo archive manager designed for people who want full control over their photo library.
+# PhotoVault 0.2 – Scanner
 
-## Core principles
+PhotoVault is a self-hosted photo archive manager for Unraid and Docker.
 
-- Originals are never modified automatically.
-- Nothing is deleted automatically.
-- The database can always be rebuilt from the filesystem.
-- Every destructive operation must be explicit and reversible.
-- PhotoVault should work without cloud services.
+## What 0.2 adds
 
-## First milestone
+- Recursive scanning of configured storage
+- Image, RAW and video discovery
+- SHA-256 hashing
+- File size and modification time indexing
+- Incremental rescans
+- Exact duplicate statistics
+- Scan progress/status API
+- Read-only media mount for safety
 
-The first milestone is intentionally read-only. PhotoVault will:
+No photos are moved, renamed, edited or deleted in this release.
 
-- start as a Docker container on Unraid
-- expose a FastAPI service
-- create and validate its SQLite database
-- scan configured folders without moving files
-- record photo metadata and checksums
-- later detect duplicates and plan reorganization
+## API
 
-## Unraid paths
+- `GET /`
+- `GET /health`
+- `POST /scan`
+- `GET /scan/status`
+- `GET /stats`
+- `GET /docs`
 
-PhotoVault application data:
+## Safety
 
-```text
-/mnt/user/photovault/
-├── database/
-├── config/
-├── logs/
-└── reports/
+The Unraid media tree is mounted read-only:
+
+```yaml
+- /mnt/user:/storage:ro
 ```
 
-The Docker container will see Unraid shares under:
-
-```text
-/storage
-```
-
-and that mount is read-only during the first milestone.
-
-## Development
-
-Run locally with:
-
-```bash
-docker compose up --build
-```
-
-Then open:
-
-- http://localhost:5000/
-- http://localhost:5000/health
-- http://localhost:5000/docs
-
-## Status
-
-Early development / foundation phase.
+PhotoVault can read and hash files, but cannot modify the media library.
