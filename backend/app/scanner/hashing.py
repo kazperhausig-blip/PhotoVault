@@ -1,7 +1,7 @@
-
 import hashlib
 from pathlib import Path
 from app.config import settings
+
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()

@@ -1,7 +1,6 @@
-
 [project]
 name = "photovault"
-version = "0.2.0"
+version = "0.3.0"
 description = "Self-hosted photo archive manager"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,6 +10,7 @@ dependencies = [
     "pydantic>=2.11,<3.0",
     "pydantic-settings>=2.10,<3.0",
     "loguru>=0.7,<1.0",
+    "pillow>=11.3,<12.0",
 ]
 
 [tool.pytest.ini_options]

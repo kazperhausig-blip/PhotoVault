@@ -1,36 +1,35 @@
+# PhotoVault 0.3 – Metadata & Duplicate Inspector
 
-# PhotoVault 0.2 – Scanner
+Version 0.3 adds metadata extraction and duplicate inspection while keeping the media library read-only.
 
-PhotoVault is a self-hosted photo archive manager for Unraid and Docker.
+## New in 0.3
 
-## What 0.2 adds
-
-- Recursive scanning of configured storage
-- Image, RAW and video discovery
-- SHA-256 hashing
-- File size and modification time indexing
-- Incremental rescans
-- Exact duplicate statistics
-- Scan progress/status API
-- Read-only media mount for safety
-
-No photos are moved, renamed, edited or deleted in this release.
-
-## API
-
-- `GET /`
-- `GET /health`
-- `POST /scan`
-- `GET /scan/status`
-- `GET /stats`
-- `GET /docs`
+- EXIF capture date extraction
+- Camera make/model
+- Lens model
+- GPS latitude/longitude when available
+- Width/height for supported image formats
+- Metadata status tracking
+- Unknown-date count
+- Duplicate group detail endpoint
+- Media detail endpoint
+- Metadata refresh during scans
 
 ## Safety
 
-The Unraid media tree is mounted read-only:
+Original media is still mounted read-only:
 
 ```yaml
 - /mnt/user:/storage:ro
 ```
 
-PhotoVault can read and hash files, but cannot modify the media library.
+PhotoVault cannot move, rename, edit or delete your originals in this release.
+
+## Useful endpoints
+
+- `POST /scan`
+- `GET /scan/status`
+- `GET /stats`
+- `GET /duplicates`
+- `GET /media/{media_id}`
+- `GET /docs`

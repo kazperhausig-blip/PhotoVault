@@ -1,11 +1,12 @@
-
 from datetime import datetime
 from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
+
 class ScanJob(Base):
     __tablename__ = "scan_jobs"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     status: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
     root_path: Mapped[str] = mapped_column(Text, nullable=False)
