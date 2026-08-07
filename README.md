@@ -1,33 +1,38 @@
-# PhotoVault 0.5 – Filename-Preserving Organizer Preview
+# PhotoVault 0.6 – Safe Copy Engine
 
-PhotoVault 0.5 is still **dry-run only**. It does not move, copy, rename, delete or modify original media.
+0.6 adds controlled copying from the read-only photo library to a dedicated writable output share.
 
-## Proposed structure
+The source library remains mounted read-only. PhotoVault does not delete, move, rename or modify originals.
 
-Unique/primary media:
+## Output
 
-`/Photos/YYYY/MM/<original filename>`
+The default Compose configuration maps:
 
-Unknown capture date:
+`/mnt/user/photovault-output` -> `/output`
 
-`/Photos/UnknownDate/<original filename>`
+Preview destinations such as `/Photos/2006/09/DSCF0032[1].jpg` become:
 
-Extra copies of exact SHA-256 duplicates:
+`/output/Photos/2006/09/DSCF0032[1].jpg`
 
-`/Duplicates/YYYY/MM/<original filename>`
+Exact extra duplicate copies become:
 
-Original filenames are preserved, including spaces and Unicode characters. Only path separators and NUL are replaced.
+`/output/Duplicates/...`
 
-If two different files would receive the same destination path, PhotoVault keeps both by adding `__2`, `__3`, etc.
+## Copy guarantees
 
-## Full preview
+1. Source has an indexed SHA-256.
+2. Destination must not already contain different data.
+3. Data is copied to a temporary sibling file.
+4. Temporary copy is SHA-256 verified.
+5. Only a verified copy is atomically renamed to its final destination.
+6. Results are stored in SQLite for audit/resume.
+7. Originals are never deleted.
 
-Use:
+## API
 
-`GET /organize/preview?path=/storage/disk_1/Backup/Billeder`
+- `GET /organize/preview`
+- `POST /organize/execute`
+- `GET /organize/execute/status`
+- `GET /organize/jobs/{job_id}`
 
-Leave `limit` blank to return the complete plan. A limit can still be used to shorten the response, but duplicate detection and summary counts always use the complete selected collection.
-
-## Safety
-
-`writes_enabled` is always `false` in 0.5, and `/mnt/user` remains mounted as `/storage:ro`.
+Execution requires the exact confirmation string `COPY_AND_VERIFY`.

@@ -48,6 +48,7 @@ def _migrate_photos_table() -> None:
 def init_database() -> None:
     from app.models.photo import Photo  # noqa: F401
     from app.models.scan_job import ScanJob  # noqa: F401
+    from app.models.copy_job import CopyJob, CopyItem  # noqa: F401
     Base.metadata.create_all(bind=engine)
     _migrate_photos_table()
 

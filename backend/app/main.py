@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.api.duplicates import router as duplicates_router
+from app.api.execute import router as execute_router
 from app.api.health import router as health_router
 from app.api.media import router as media_router
 from app.api.organize import router as organize_router
@@ -32,6 +33,7 @@ app.include_router(stats_router)
 app.include_router(duplicates_router)
 app.include_router(media_router)
 app.include_router(organize_router)
+app.include_router(execute_router)
 
 
 @app.get("/", tags=["system"])
@@ -43,5 +45,5 @@ def home() -> dict:
         "database": "configured",
         "scanner": "ready",
         "metadata": "enabled",
-        "organizer": "preview-only",
+        "organizer": "safe-copy-enabled",
     }

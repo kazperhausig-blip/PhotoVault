@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "PhotoVault"
-    app_version: str = "0.5.0"
+    app_version: str = "0.6.0"
 
     database_path: Path = Path("/data/database/photovault.db")
     config_path: Path = Path("/data/config")
@@ -23,6 +23,10 @@ class Settings(BaseSettings):
 
     # Preview destinations are logical output paths only in 0.4.
     # No files are written, moved, renamed or deleted.
+
+    # 0.6 execution output. Docker maps a dedicated Unraid share here as writable.
+    output_path: Path = Path("/output")
+
     organizer_root: Path = Path("/Photos")
     duplicate_root: Path = Path("/Duplicates")
     unknown_date_root: Path = Path("/Photos/UnknownDate")

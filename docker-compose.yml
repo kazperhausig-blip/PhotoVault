@@ -17,8 +17,10 @@ services:
       PHOTOVAULT_ORGANIZER_ROOT: /Photos
       PHOTOVAULT_DUPLICATE_ROOT: /Duplicates
       PHOTOVAULT_UNKNOWN_DATE_ROOT: /Photos/UnknownDate
+      PHOTOVAULT_OUTPUT_PATH: /output
       PHOTOVAULT_LOG_LEVEL: INFO
     volumes:
       - /mnt/user/photovault:/data
       - /mnt/user:/storage:ro
+      - /mnt/user/photovault-output:/output
     restart: unless-stopped
