@@ -9,5 +9,6 @@ router = APIRouter(tags=["organizer"])
 def organizer_preview(
     path: str | None = Query(default=None, description="Optional scanned source root, e.g. /storage/disk_1/Backup/Billeder"),
     limit: int | None = Query(default=None, ge=1, le=50000, description="Optional response limit. Leave blank to return the complete plan."),
+    exclude: list[str] = Query(default=[]),
 ) -> dict:
-    return build_preview(root_path=path, limit=limit)
+    return build_preview(root_path=path, limit=limit, exclude_paths=exclude)

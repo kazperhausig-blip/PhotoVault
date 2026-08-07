@@ -14,6 +14,7 @@ router = APIRouter(tags=["safe-copy"])
 
 class ExecuteRequest(BaseModel):
     path: str
+    exclude: list[str] = []
     confirmation: str
 
 
@@ -27,7 +28,7 @@ def execute(request: ExecuteRequest) -> dict:
     if snapshot()["running"]:
         raise HTTPException(status_code=409, detail="A copy job is already running")
 
-    job_id = create_job(request.path)
+    job_id = create_job(request.path, request.exclude)
     Thread(target=run_job, args=(job_id,), daemon=True, name=f"photovault-copy-{job_id}").start()
     return {
         "status": "accepted",

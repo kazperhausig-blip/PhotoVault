@@ -27,8 +27,8 @@ def _logical_to_output(logical: str) -> Path:
     return destination
 
 
-def create_job(source_root: str) -> int:
-    plan = build_preview(root_path=source_root, limit=None)
+def create_job(source_root: str, exclude_paths: list[str] | None = None) -> int:
+    plan = build_preview(root_path=source_root, limit=None, exclude_paths=exclude_paths)
     now = datetime.utcnow()
 
     with SessionLocal() as session:

@@ -37,17 +37,34 @@ def validate_scan_root(requested: Path | None) -> Path:
     return root
 
 
-def _is_excluded(path: Path) -> bool:
+
+def _normalize_exclusions(requested: list[Path] | None = None) -> list[Path]:
+    """Return global + request exclusions, safely constrained to /storage."""
+    storage = settings.storage_path.resolve()
+    exclusions = [p.resolve() for p in settings.excluded_paths]
+
+    for item in requested or []:
+        resolved = item.resolve()
+        if not _is_within(resolved, storage):
+            raise ValueError(f"Excluded path must be inside the configured storage tree: {item}")
+        exclusions.append(resolved)
+
+    return exclusions
+
+
+def _is_excluded(path: Path, exclusions: list[Path]) -> bool:
     resolved = path.resolve()
-    return any(_is_within(resolved, excluded) for excluded in settings.excluded_paths)
+    return any(_is_within(resolved, excluded) for excluded in exclusions)
 
 
-def discover_media(root: Path) -> Iterator[Path]:
+def discover_media(root: Path, requested_exclusions: list[Path] | None = None) -> Iterator[Path]:
+    exclusions = _normalize_exclusions(requested_exclusions)
+
     for current_root, dirnames, filenames in os.walk(root):
         current = Path(current_root)
         dirnames[:] = [
             name for name in dirnames
-            if not _is_excluded(current / name)
+            if not _is_excluded(current / name, exclusions)
             and not name.startswith(".")
             and name not in {"@eaDir", "#recycle", ".Trash", ".Trashes"}
         ]
@@ -58,8 +75,6 @@ def discover_media(root: Path) -> Iterator[Path]:
             path = current / filename
             if path.suffix.lower() in SUPPORTED_EXTENSIONS:
                 yield path
-
-
 def create_scan_job(root: Path) -> int:
     with SessionLocal() as session:
         job = ScanJob(status="queued", root_path=str(root), started_at=datetime.utcnow())
@@ -69,7 +84,7 @@ def create_scan_job(root: Path) -> int:
         return job.id
 
 
-def run_scan(job_id: int, root: Path) -> None:
+def run_scan(job_id: int, root: Path, requested_exclusions: list[Path] | None = None) -> None:
     if not state.begin(job_id=job_id, root_path=str(root)):
         logger.warning("A scan is already running")
         return
@@ -84,7 +99,7 @@ def run_scan(job_id: int, root: Path) -> None:
         session.commit()
 
         try:
-            for path in discover_media(root):
+            for path in discover_media(root, requested_exclusions):
                 state.increment("discovered")
                 state.update(current_file=str(path))
                 job.discovered = state.snapshot()["discovered"]

@@ -55,7 +55,7 @@ def _make_unique(path: Path, used: set[str]) -> Path:
     return candidate
 
 
-def build_preview(root_path: str | None = None, limit: int | None = None) -> dict:
+def build_preview(root_path: str | None = None, limit: int | None = None, exclude_paths: list[str] | None = None) -> dict:
     with SessionLocal() as session:
         stmt = select(Photo).order_by(Photo.path)
         if root_path:
@@ -65,6 +65,16 @@ def build_preview(root_path: str | None = None, limit: int | None = None) -> dic
         # Duplicate detection must use the COMPLETE filtered collection.
         # The display limit is applied only after the plan is built.
         photos = list(session.scalars(stmt).all())
+
+        normalized_excludes = [x.rstrip("/") for x in (exclude_paths or []) if x.strip()]
+        if normalized_excludes:
+            photos = [
+                photo for photo in photos
+                if not any(
+                    photo.path == excluded or photo.path.startswith(excluded + "/")
+                    for excluded in normalized_excludes
+                )
+            ]
 
         hash_groups: dict[str, list[Photo]] = defaultdict(list)
         for photo in photos:
@@ -138,6 +148,7 @@ def build_preview(root_path: str | None = None, limit: int | None = None) -> dic
             "mode": "dry-run",
             "writes_enabled": False,
             "root_filter": root_path,
+            "excluded_paths": normalized_excludes,
             "total_media_in_plan": len(all_actions),
             "returned_actions": len(actions),
             "limit": limit,
