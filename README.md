@@ -1,40 +1,33 @@
-# PhotoVault 0.4 – Organizer Preview
+# PhotoVault 0.5 – Filename-Preserving Organizer Preview
 
-PhotoVault 0.4 adds a **dry-run organizer**. It does not move, rename, delete or modify original media.
+PhotoVault 0.5 is still **dry-run only**. It does not move, copy, rename, delete or modify original media.
 
-## What the preview proposes
+## Proposed structure
 
-Unique/primary media with a capture date:
+Unique/primary media:
 
-`/Photos/YYYY/MM/YYYY-MM-DD_HH-MM-SS_original-name.ext`
+`/Photos/YYYY/MM/<original filename>`
 
-Media without a capture date:
+Unknown capture date:
 
-`/Photos/UnknownDate/original-name.ext`
+`/Photos/UnknownDate/<original filename>`
 
 Extra copies of exact SHA-256 duplicates:
 
-`/Duplicates/YYYY/MM/original-name.ext`
+`/Duplicates/YYYY/MM/<original filename>`
 
-Name collisions are resolved with `__2`, `__3`, etc. No proposed destination is allowed to overwrite another item.
+Original filenames are preserved, including spaces and Unicode characters. Only path separators and NUL are replaced.
 
-## New endpoint
+If two different files would receive the same destination path, PhotoVault keeps both by adding `__2`, `__3`, etc.
 
-`GET /organize/preview`
+## Full preview
 
-Optional query parameters:
+Use:
 
-- `path=/storage/disk_1/Backup/Billeder`
-- `limit=100`
+`GET /organize/preview?path=/storage/disk_1/Backup/Billeder`
 
-Example:
-
-`/organize/preview?path=/storage/disk_1/Backup/Billeder&limit=100`
+Leave `limit` blank to return the complete plan. A limit can still be used to shorten the response, but duplicate detection and summary counts always use the complete selected collection.
 
 ## Safety
 
-The original Unraid tree remains mounted:
-
-`/mnt/user:/storage:ro`
-
-`writes_enabled` in the preview response is always `false` in 0.4.
+`writes_enabled` is always `false` in 0.5, and `/mnt/user` remains mounted as `/storage:ro`.
