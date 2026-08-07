@@ -1,41 +1,60 @@
-# 📸 PhotoVault
+# PhotoVault
 
-PhotoVault is an open-source, self-hosted photo archive manager built for people who want to own their photo library.
+PhotoVault is a self-hosted photo archive manager designed for people who want full control over their photo library.
 
-Unlike cloud services, PhotoVault never locks your photos into a proprietary database.
+## Core principles
 
-Your photos always remain normal files.
+- Originals are never modified automatically.
+- Nothing is deleted automatically.
+- The database can always be rebuilt from the filesystem.
+- Every destructive operation must be explicit and reversible.
+- PhotoVault should work without cloud services.
 
-## Goals
+## First milestone
 
-- Organize photos automatically
-- Detect duplicates
-- Preserve originals
-- Integrate with Immich
-- Support RAW formats
-- Support Live Photos
-- Automatic timeline
-- AI ready
-- Docker first
-- Unraid optimized
+The first milestone is intentionally read-only. PhotoVault will:
 
-## Design Principles
+- start as a Docker container on Unraid
+- expose a FastAPI service
+- create and validate its SQLite database
+- scan configured folders without moving files
+- record photo metadata and checksums
+- later detect duplicates and plan reorganization
 
-- Originals are immutable
-- Database can always be rebuilt
-- No automatic deletion
-- Every operation is reversible
-- Everything works offline
+## Unraid paths
 
-## Planned Features
+PhotoVault application data:
 
-- Scanner
-- Metadata indexing
-- Duplicate detection
-- Timeline
-- Collections
-- Dashboard
-- Statistics
-- Face collections
-- Immich synchronization
-- AI plugins
+```text
+/mnt/user/photovault/
+├── database/
+├── config/
+├── logs/
+└── reports/
+```
+
+The Docker container will see Unraid shares under:
+
+```text
+/storage
+```
+
+and that mount is read-only during the first milestone.
+
+## Development
+
+Run locally with:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+- http://localhost:5000/
+- http://localhost:5000/health
+- http://localhost:5000/docs
+
+## Status
+
+Early development / foundation phase.

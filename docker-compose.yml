@@ -1,19 +1,19 @@
-version: "3.9"
-
 services:
-
   photovault:
-
-    build: .
-
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: photovault
-
     ports:
       - "5000:5000"
-
+    environment:
+      PHOTOVAULT_DATABASE_PATH: /data/database/photovault.db
+      PHOTOVAULT_CONFIG_PATH: /data/config
+      PHOTOVAULT_LOG_PATH: /data/logs
+      PHOTOVAULT_REPORTS_PATH: /data/reports
+      PHOTOVAULT_STORAGE_PATH: /storage
+      PHOTOVAULT_LOG_LEVEL: INFO
     volumes:
-      - ./config:/config
-      - ./database:/database
-      - /mnt/user/photos:/photos
-
+      - /mnt/user/photovault:/data
+      - /mnt/user:/storage:ro
     restart: unless-stopped

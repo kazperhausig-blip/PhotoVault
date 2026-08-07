@@ -1,7 +1,0 @@
-backend/
-└── app/
-    ├── main.py
-    ├── config.py
-    ├── database.py
-    └── models/
-        └── photo.py
