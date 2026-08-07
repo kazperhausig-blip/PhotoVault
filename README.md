@@ -1,35 +1,40 @@
-# PhotoVault 0.3 – Metadata & Duplicate Inspector
+# PhotoVault 0.4 – Organizer Preview
 
-Version 0.3 adds metadata extraction and duplicate inspection while keeping the media library read-only.
+PhotoVault 0.4 adds a **dry-run organizer**. It does not move, rename, delete or modify original media.
 
-## New in 0.3
+## What the preview proposes
 
-- EXIF capture date extraction
-- Camera make/model
-- Lens model
-- GPS latitude/longitude when available
-- Width/height for supported image formats
-- Metadata status tracking
-- Unknown-date count
-- Duplicate group detail endpoint
-- Media detail endpoint
-- Metadata refresh during scans
+Unique/primary media with a capture date:
+
+`/Photos/YYYY/MM/YYYY-MM-DD_HH-MM-SS_original-name.ext`
+
+Media without a capture date:
+
+`/Photos/UnknownDate/original-name.ext`
+
+Extra copies of exact SHA-256 duplicates:
+
+`/Duplicates/YYYY/MM/original-name.ext`
+
+Name collisions are resolved with `__2`, `__3`, etc. No proposed destination is allowed to overwrite another item.
+
+## New endpoint
+
+`GET /organize/preview`
+
+Optional query parameters:
+
+- `path=/storage/disk_1/Backup/Billeder`
+- `limit=100`
+
+Example:
+
+`/organize/preview?path=/storage/disk_1/Backup/Billeder&limit=100`
 
 ## Safety
 
-Original media is still mounted read-only:
+The original Unraid tree remains mounted:
 
-```yaml
-- /mnt/user:/storage:ro
-```
+`/mnt/user:/storage:ro`
 
-PhotoVault cannot move, rename, edit or delete your originals in this release.
-
-## Useful endpoints
-
-- `POST /scan`
-- `GET /scan/status`
-- `GET /stats`
-- `GET /duplicates`
-- `GET /media/{media_id}`
-- `GET /docs`
+`writes_enabled` in the preview response is always `false` in 0.4.

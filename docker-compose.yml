@@ -14,6 +14,9 @@ services:
       PHOTOVAULT_STORAGE_PATH: /storage
       PHOTOVAULT_SCAN_ROOT: /storage
       PHOTOVAULT_SCAN_EXCLUDE_PATHS: /storage/photovault,/storage/appdata,/storage/system,/storage/domains,/storage/isos
+      PHOTOVAULT_ORGANIZER_ROOT: /Photos
+      PHOTOVAULT_DUPLICATE_ROOT: /Duplicates
+      PHOTOVAULT_UNKNOWN_DATE_ROOT: /Photos/UnknownDate
       PHOTOVAULT_LOG_LEVEL: INFO
     volumes:
       - /mnt/user/photovault:/data

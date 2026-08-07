@@ -11,24 +11,30 @@
 - [x] SHA-256
 - [x] Incremental scans
 - [x] Statistics
-- [x] Exact duplicate group count
+- [x] Exact duplicate detection
 
 ## 0.3 Metadata & Duplicate Inspector
 - [x] EXIF capture date
 - [x] Camera make/model
 - [x] Lens model
-- [x] GPS coordinates where available
-- [x] Width/height
-- [x] Unknown-date count
-- [x] Duplicate group detail endpoint
-- [x] Media detail endpoint
-- [ ] Video metadata
-- [ ] HEIC metadata improvements
-- [ ] RAW metadata extraction
+- [x] GPS where available
+- [x] Duplicate inspection
+- [x] Media details
 
 ## 0.4 Organizer Preview
-- [ ] Date-based destination proposal
-- [ ] Duplicate move proposal
-- [ ] UnknownDate proposal
-- [ ] Dry-run report
-- [ ] No writes to originals yet
+- [x] Date-based destination proposals
+- [x] Exact-duplicate routing proposals
+- [x] UnknownDate routing
+- [x] Filename collision protection
+- [x] Dry-run API
+- [x] No writes to originals
+
+## 0.5 Controlled Organizer
+- [ ] Persist preview plans
+- [ ] Explicit approval token / plan ID
+- [ ] Dedicated writable destination share
+- [ ] Copy-first workflow
+- [ ] Verify hashes after copy
+- [ ] Never overwrite
+- [ ] Audit log
+- [ ] Original deletion remains disabled by default

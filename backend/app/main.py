@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from app.api.duplicates import router as duplicates_router
 from app.api.health import router as health_router
 from app.api.media import router as media_router
+from app.api.organize import router as organize_router
 from app.api.scan import router as scan_router
 from app.api.stats import router as stats_router
 from app.config import settings
@@ -30,6 +31,7 @@ app.include_router(scan_router)
 app.include_router(stats_router)
 app.include_router(duplicates_router)
 app.include_router(media_router)
+app.include_router(organize_router)
 
 
 @app.get("/", tags=["system"])
@@ -41,4 +43,5 @@ def home() -> dict:
         "database": "configured",
         "scanner": "ready",
         "metadata": "enabled",
+        "organizer": "preview-only",
     }
