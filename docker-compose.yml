@@ -13,7 +13,8 @@ services:
       PHOTOVAULT_REPORTS_PATH: /data/reports
       PHOTOVAULT_STORAGE_PATH: /storage
       PHOTOVAULT_SCAN_ROOT: /storage
-      PHOTOVAULT_SCAN_EXCLUDE_PATHS: /storage/photovault,/storage/appdata,/storage/system,/storage/domains,/storage/isos
+      PHOTOVAULT_SCAN_EXCLUDE_PATHS: "/storage/photovault,/storage/appdata,/storage/system,/storage/domains,/storage/isos,/storage/disk_1/Backup/Louise/Louise backup/Musik,/storage/disk_1/Keys,/storage/disk_1/Musik,/storage/disk_1/Pictures/Macbook/Dagmar billeder/Pictures/Keys,/storage/disk_1/Pictures/Pictures/Keys,/storage/disk_1/ServerFolders"
+      PHOTOVAULT_ALLOWED_EXTENSIONS: ".jpg,.jpeg,.png,.tif,.tiff,.heic,.heif,.cr2,.cr3,.nef,.nrw,.arw,.srf,.sr2,.orf,.rw2,.raf,.dng,.pef,.raw,.rwl,.3fr,.fff,.iiq,.kdc,.mef,.mos,.mrw,.x3f,.mp4,.mov,.m4v,.avi,.mkv,.mts,.m2ts,.3gp,.webm,.mpg,.mpeg"
       PHOTOVAULT_ORGANIZER_ROOT: /Photos
       PHOTOVAULT_DUPLICATE_ROOT: /Duplicates
       PHOTOVAULT_UNKNOWN_DATE_ROOT: /Photos/UnknownDate

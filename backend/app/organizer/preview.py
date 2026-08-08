@@ -66,7 +66,16 @@ def build_preview(root_path: str | None = None, limit: int | None = None, exclud
         # The display limit is applied only after the plan is built.
         photos = list(session.scalars(stmt).all())
 
-        normalized_excludes = [x.rstrip("/") for x in (exclude_paths or []) if x.strip()]
+        # Defense in depth: even if an older database still contains web/system
+        # graphics, 0.8 will not include them in the organizer plan.
+        photos = [photo for photo in photos if photo.extension.lower() in settings.archive_extensions]
+
+        normalized_excludes = [str(x).rstrip("/") for x in settings.excluded_paths]
+        normalized_excludes.extend(
+            x.rstrip("/") for x in (exclude_paths or []) if x.strip()
+        )
+        # Preserve order while removing duplicates.
+        normalized_excludes = list(dict.fromkeys(normalized_excludes))
         if normalized_excludes:
             photos = [
                 photo for photo in photos

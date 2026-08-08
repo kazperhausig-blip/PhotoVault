@@ -1,6 +1,6 @@
 [project]
 name = "photovault"
-version = "0.6.0
+version = "0.8.0"
 description = "Self-hosted photo archive manager"
 requires-python = ">=3.13"
 dependencies = [

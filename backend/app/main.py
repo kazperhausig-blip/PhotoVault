@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from app.api.duplicates import router as duplicates_router
 from app.api.execute import router as execute_router
 from app.api.health import router as health_router
+from app.api.filter_config import router as filter_config_router
 from app.api.media import router as media_router
 from app.api.organize import router as organize_router
 from app.api.scan import router as scan_router
@@ -28,6 +29,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
 app.include_router(health_router)
+app.include_router(filter_config_router)
 app.include_router(scan_router)
 app.include_router(stats_router)
 app.include_router(duplicates_router)

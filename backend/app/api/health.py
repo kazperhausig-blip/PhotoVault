@@ -15,4 +15,5 @@ def health() -> dict:
         "database": "ok" if database_ok else "error",
         "scanner": "ready",
         "storage_mode": "read-only",
+        "archive_filter": "enabled",
     }

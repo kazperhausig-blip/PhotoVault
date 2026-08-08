@@ -11,7 +11,7 @@ from app.database import SessionLocal
 from app.metadata.extractor import extract_metadata
 from app.models.photo import Photo
 from app.models.scan_job import ScanJob
-from app.scanner.extensions import SUPPORTED_EXTENSIONS, media_type_for_extension
+from app.scanner.extensions import media_type_for_extension
 from app.scanner.hashing import sha256_file
 from app.scanner import state
 
@@ -73,7 +73,7 @@ def discover_media(root: Path, requested_exclusions: list[Path] | None = None) -
             if filename.startswith("."):
                 continue
             path = current / filename
-            if path.suffix.lower() in SUPPORTED_EXTENSIONS:
+            if path.suffix.lower() in settings.archive_extensions:
                 yield path
 def create_scan_job(root: Path) -> int:
     with SessionLocal() as session:

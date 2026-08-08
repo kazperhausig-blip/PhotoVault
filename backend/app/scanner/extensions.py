@@ -1,6 +1,11 @@
-IMAGE_EXTENSIONS = {
-    ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff",
-    ".heic", ".heif", ".webp", ".avif",
+PHOTO_IMAGE_EXTENSIONS = {
+    ".jpg", ".jpeg", ".png", ".tif", ".tiff", ".heic", ".heif",
+}
+
+# These are technically images, but are intentionally NOT part of the default
+# photo archive profile because they are commonly web/system/game graphics.
+NON_PHOTO_IMAGE_EXTENSIONS = {
+    ".gif", ".bmp", ".webp", ".avif", ".ico",
 }
 
 RAW_EXTENSIONS = {
@@ -14,7 +19,19 @@ VIDEO_EXTENSIONS = {
     ".3gp", ".webm", ".mpg", ".mpeg",
 }
 
-SUPPORTED_EXTENSIONS = IMAGE_EXTENSIONS | RAW_EXTENSIONS | VIDEO_EXTENSIONS
+DEFAULT_ARCHIVE_EXTENSIONS = PHOTO_IMAGE_EXTENSIONS | RAW_EXTENSIONS | VIDEO_EXTENSIONS
+
+
+def parse_extension_list(value: str) -> set[str]:
+    result: set[str] = set()
+    for item in value.split(","):
+        item = item.strip().lower()
+        if not item:
+            continue
+        if not item.startswith("."):
+            item = "." + item
+        result.add(item)
+    return result
 
 
 def media_type_for_extension(extension: str) -> str:
